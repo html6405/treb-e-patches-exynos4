@@ -1,0 +1,29 @@
+From 71d13f483037850a1ffc20ad7de1ad433f9380da Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Mon, 21 Dec 2020 19:09:25 +0100
+Subject: [PATCH]  Hack: Ignore invalid pthread_t to %s
+
+We can't set/hack target_sdk_version from our driver.
+
+Change-Id: I0571eea8bc1df27042710bbbff68e7f1a99d4a73
+---
+ libc/bionic/pthread_internal.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libc/bionic/pthread_internal.cpp b/libc/bionic/pthread_internal.cpp
+index e0911581b..179614a59 100644
+--- a/libc/bionic/pthread_internal.cpp
++++ b/libc/bionic/pthread_internal.cpp
+@@ -110,7 +110,8 @@ pthread_internal_t* __pthread_internal_find(pthread_t thread_id, const char* cal
+       // TODO: try getting rid of this when Treble lets us keep vendor blobs on an old API level.
+       async_safe_format_log(ANDROID_LOG_WARN, "libc", "invalid pthread_t (0) passed to %s", caller);
+     } else {
+-      async_safe_fatal("invalid pthread_t %p passed to %s", thread, caller);
++        async_safe_format_log(ANDROID_LOG_WARN, "libc", "invalid pthread_t (0) passed to %s", caller);
++      //async_safe_fatal("invalid pthread_t %p passed to %s", thread, caller);
+     }
+   }
+   return nullptr;
+-- 
+2.25.1
+

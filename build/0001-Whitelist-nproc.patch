@@ -1,0 +1,25 @@
+From 3557c44f9c771bd0602aceb9069fb10350efee40 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@zell-net.at>
+Date: Fri, 15 Jan 2021 14:30:59 +0100
+Subject: [PATCH] Whitelist nproc.
+
+Change-Id: I887c03c367755a994268d6eb9114a8da6416e9a7
+---
+ ui/build/paths/config.go | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ui/build/paths/config.go b/ui/build/paths/config.go
+index 57174013..01edbb46 100644
+--- a/ui/build/paths/config.go
++++ b/ui/build/paths/config.go
+@@ -87,6 +87,7 @@ var Configuration = map[string]PathConfig{
+ 	"java":    Allowed,
+ 	"javap":   Allowed,
+ 	"lsof":    Allowed,
++	"nproc":   Allowed,
+ 	"openssl": Allowed,
+ 	"patch":   Allowed,
+ 	"pstree":  Allowed,
+-- 
+2.25.1
+

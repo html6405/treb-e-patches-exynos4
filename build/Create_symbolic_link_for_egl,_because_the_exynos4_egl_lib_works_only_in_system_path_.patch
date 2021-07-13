@@ -1,0 +1,17 @@
+Index: target/product/gsi/Android.mk
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- target/product/gsi/Android.mk	(revision 9e2d21f913902bae9b61478639bf057808f3b4fc)
++++ target/product/gsi/Android.mk	(revision ff5d59b9fedbd057374e648ecf94d5875cfc3029)
+@@ -196,7 +196,8 @@
+ # belong to core CSI.
+ LOCAL_POST_INSTALL_CMD := \
+     mkdir -p $(TARGET_OUT)/etc/init; \
+-    ln -sf /system/system_ext/etc/init/config $(TARGET_OUT)/etc/init/config
++    ln -sf /system/system_ext/etc/init/config $(TARGET_OUT)/etc/init/config \
++    ln -s /vendor/lib/egl $(TARGET_OUT)/lib/egl
+ 
+ include $(BUILD_PREBUILT)
+ 

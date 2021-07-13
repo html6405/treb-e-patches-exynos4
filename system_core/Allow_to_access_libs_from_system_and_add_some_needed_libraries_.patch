@@ -1,0 +1,19 @@
+Index: contents/namespace/vendordefault.cc
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- contents/namespace/vendordefault.cc	(revision 457c22699b279c409e3ce05f922619dd00268cd9)
++++ contents/namespace/vendordefault.cc	(revision 349aac03a29e0ba6568efa945da1b0caf671e956)
+@@ -115,7 +115,11 @@
+           .AddSharedLib(Var("VNDK_USING_CORE_VARIANT_LIBRARIES"));
+     }
+   }
++  ns.AddSearchPath("/system/${LIB}", AsanPath::WITH_DATA_ASAN);
+   ns.AddRequires(std::vector{"libneuralnetworks.so"});
++  ns.AddRequires(std::vector{"libicuuc.so"});
++  ns.AddRequires(std::vector{"libgui.so"});
++  ns.AddRequires(std::vector{"libandroidicu.so"});
+   return ns;
+ }
+ }  // namespace contents

@@ -1,0 +1,53 @@
+From 01ac1d91a060a472b125ffde3a35996b62e821c2 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Wed, 23 Dec 2020 13:07:02 +0100
+Subject: [PATCH] Soong configs for BOARD_EGL_NEEDS_HANDLE_VALUE.
+
+Change-Id: I1fab2eb39fc3427f9a4d81c94ff8bda2e8359634
+---
+ build/soong/Android.bp     | 16 ++++++++++++++++
+ config/BoardConfigSoong.mk |  1 +
+ 2 files changed, 17 insertions(+)
+
+diff --git a/build/soong/Android.bp b/build/soong/Android.bp
+index ee68c11e..80441616 100644
+--- a/build/soong/Android.bp
++++ b/build/soong/Android.bp
+@@ -257,6 +257,22 @@ has_memfd_backport {
+     },
+ }
+ 
++soong_config_module_type {
++    name: "egl_needs_handle_value",
++    module_type: "cc_defaults",
++    config_namespace: "lineageGlobalVars",
++    bool_variables: ["egl_needs_handle_value"],
++    properties: ["cppflags"],
++}
++
++egl_needs_handle_value {
++    name: "egl_needs_handle_value_defaults",
++    soong_config_variables: {
++        egl_needs_handle_value: {
++            cppflags: ["-DEGL_NEEDS_HANDLE"],
++        },
++    },
++}
+ soong_config_module_type {
+     name: "bootloader_message_offset",
+     module_type: "cc_defaults",
+diff --git a/config/BoardConfigSoong.mk b/config/BoardConfigSoong.mk
+index c0b01674..bca4d0de 100644
+--- a/config/BoardConfigSoong.mk
++++ b/config/BoardConfigSoong.mk
+@@ -65,6 +65,7 @@ endif
+ SOONG_CONFIG_lineageGlobalVars_disable_postrender_cleanup := $(TARGET_DISABLE_POSTRENDER_CLEANUP)
+ SOONG_CONFIG_lineageGlobalVars_has_legacy_camera_hal1 := $(TARGET_HAS_LEGACY_CAMERA_HAL1)
+ SOONG_CONFIG_lineageGlobalVars_has_memfd_backport := $(TARGET_HAS_MEMFD_BACKPORT)
++SOONG_CONFIG_lineageGlobalVars_egl_needs_handle_value := $(BOARD_EGL_NEEDS_HANDLE_VALUE)
+ SOONG_CONFIG_lineageGlobalVars_ignores_ftp_pptp_conntrack_failure := $(TARGET_IGNORES_FTP_PPTP_CONNTRACK_FAILURE)
+ SOONG_CONFIG_lineageGlobalVars_needs_netd_direct_connect_rule := $(TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE)
+ SOONG_CONFIG_lineageNvidiaVars_uses_nv_enhancements := $(NV_ANDROID_FRAMEWORK_ENHANCEMENTS)
+-- 
+2.25.1
+

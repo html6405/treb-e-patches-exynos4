@@ -1,0 +1,44 @@
+From 8b50213a788b3d34b4c5a03b1101ba6f2748f093 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Mon, 21 Dec 2020 17:01:11 +0100
+Subject: [PATCH] HidlSupport: Fix zero-termination for legacy blobs.
+
+Change-Id: I4cc23a66cb8b37b23b1f67d6f185586b0f42a2df
+---
+ base/HidlSupport.cpp | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/base/HidlSupport.cpp b/base/HidlSupport.cpp
+index af805b9..1c3594b 100644
+--- a/base/HidlSupport.cpp
++++ b/base/HidlSupport.cpp
+@@ -257,13 +257,21 @@ void hidl_string::setToExternal(const char *data, size_t size) {
+     // directly into the read-only binder buffer. If we manually copy the
+     // data now to add a zero, then we lose the efficiency of this method.
+     // Checking here (it's also checked in the parceling code later).
+-    CHECK(data[size] == '\0');
++    // CHECK(data[size] == '\0');
+ 
+-    clear();
++    // However, when it occurs it is possibly due legacy blobs which can't be
++    // updated this easily. So copy it and add a zero anyway and loose some
++    // efficiency in this case.
+ 
+-    mBuffer = data;
+-    mSize = static_cast<uint32_t>(size);
+-    mOwnsBuffer = false;
++    clear();
++    if (data[size] != '\0') {
++        copyFrom(data, size);
++        LOG(ERROR) << "===== Correcting data with 0-character. mBuffer:" << mBuffer << " mSize:" << mSize << " ====" ;
++    } else {
++        mBuffer = data;
++        mSize = static_cast<uint32_t>(size);
++        mOwnsBuffer = false;
++    }
+ }
+ 
+ const char *hidl_string::c_str() const {
+-- 
+2.25.1
+

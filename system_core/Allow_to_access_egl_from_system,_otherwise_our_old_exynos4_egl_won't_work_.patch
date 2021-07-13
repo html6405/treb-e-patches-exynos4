@@ -1,0 +1,17 @@
+Index: contents/namespace/sphal.cc
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- contents/namespace/sphal.cc	(revision 349aac03a29e0ba6568efa945da1b0caf671e956)
++++ contents/namespace/sphal.cc	(revision 0fb67fd95e8be1e29d29567038d66a8cd62e95b2)
+@@ -43,6 +43,9 @@
+   ns.AddSearchPath("/vendor/${LIB}/egl", AsanPath::WITH_DATA_ASAN);
+   ns.AddSearchPath("/vendor/${LIB}/hw", AsanPath::NONE);
+ 
++  ns.AddSearchPath("/system/${LIB}", AsanPath::WITH_DATA_ASAN);
++  ns.AddSearchPath("/system/${LIB}/egl", AsanPath::WITH_DATA_ASAN);
++
+   ns.AddPermittedPath("/odm/${LIB}", AsanPath::WITH_DATA_ASAN);
+   ns.AddPermittedPath("/vendor/${LIB}", AsanPath::WITH_DATA_ASAN);
+   ns.AddPermittedPath("/system/vendor/${LIB}", AsanPath::NONE);

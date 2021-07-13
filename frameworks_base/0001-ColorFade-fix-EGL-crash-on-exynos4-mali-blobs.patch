@@ -1,0 +1,52 @@
+From 5abf35fbc30fc52b43a3c843d6a75c1e95481cf9 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Mon, 21 Dec 2020 16:50:20 +0100
+Subject: [PATCH] ColorFade: fix EGL crash on exynos4 mali blobs .
+
+Change-Id: If2fd376681c7d32b1aa02ebabaa6985c798d893f
+---
+ .../java/com/android/server/display/ColorFade.java    | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/display/ColorFade.java b/services/core/java/com/android/server/display/ColorFade.java
+index ec2b0c0a683..e21dc08e912 100644
+--- a/services/core/java/com/android/server/display/ColorFade.java
++++ b/services/core/java/com/android/server/display/ColorFade.java
+@@ -27,6 +27,7 @@ import android.opengl.EGLDisplay;
+ import android.opengl.EGLSurface;
+ import android.opengl.GLES11Ext;
+ import android.opengl.GLES20;
++import android.os.SystemProperties;
+ import android.os.IBinder;
+ import android.util.Slog;
+ import android.view.Display;
+@@ -76,6 +77,9 @@ final class ColorFade {
+     private static final int EGL_GL_COLORSPACE_KHR = 0x309D;
+     private static final int EGL_GL_COLORSPACE_DISPLAY_P3_PASSTHROUGH_EXT = 0x3490;
+ 
++    private static final boolean DESTROY_SURFACE_AFTER_DETACH =
++            SystemProperties.getBoolean("ro.egl.destroy_after_detach", false);
++
+     private final int mDisplayId;
+ 
+     // Set to true when the animation context has been fully prepared.
+@@ -338,10 +342,15 @@ final class ColorFade {
+                 destroyScreenshotTexture();
+                 destroyGLShaders();
+                 destroyGLBuffers();
+-                destroyEglSurface();
++                if (!DESTROY_SURFACE_AFTER_DETACH) {
++                    destroyEglSurface();
++                }
+             } finally {
+                 detachEglContext();
+             }
++            if (DESTROY_SURFACE_AFTER_DETACH) {
++                destroyEglSurface();
++            }
+             // This is being called with no active context so shouldn't be
+             // needed but is safer to not change for now.
+             GLES20.glFlush();
+-- 
+2.25.1
+

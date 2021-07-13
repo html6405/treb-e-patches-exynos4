@@ -1,0 +1,91 @@
+From 609d7a7cea99073c43af3db1aeca31792a00a36d Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Wed, 23 Dec 2020 12:17:31 +0100
+Subject: [PATCH] Further port of palm rejection.
+
+Change-Id: Ide9f2f1e72f6839edf3f1d59c196bec963f59786
+---
+ .../reader/mapper/TouchInputMapper.cpp         | 18 ++++++++++++++++++
+ .../reader/mapper/TouchInputMapper.h           |  4 ++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/services/inputflinger/reader/mapper/TouchInputMapper.cpp b/services/inputflinger/reader/mapper/TouchInputMapper.cpp
+index da8f7d1a5..5229485c9 100644
+--- a/services/inputflinger/reader/mapper/TouchInputMapper.cpp
++++ b/services/inputflinger/reader/mapper/TouchInputMapper.cpp
+@@ -38,6 +38,8 @@ static constexpr nsecs_t TOUCH_DATA_TIMEOUT = ms2ns(20);
+ // data.
+ static constexpr nsecs_t STYLUS_DATA_LATENCY = ms2ns(10);
+ 
++static const nsecs_t STYLUS_PALM_REJECTION_TIME = ms2ns(50);
++
+ // --- Static Definitions ---
+ 
+ template <typename T>
+@@ -3322,6 +3324,7 @@ void TouchInputMapper::dispatchPointerStylus(nsecs_t when, uint32_t policyFlags)
+         mPointerSimple.currentProperties.id = 0;
+         mPointerSimple.currentProperties.toolType =
+                 mCurrentCookedState.cookedPointerData.pointerProperties[index].toolType;
++       mLastStylusTime = when;
+     } else {
+         down = false;
+         hovering = false;
+@@ -3409,6 +3412,11 @@ void TouchInputMapper::dispatchPointerSimple(nsecs_t when, uint32_t policyFlags,
+     float yCursorPosition;
+     mPointerController->getPosition(&xCursorPosition, &yCursorPosition);
+ 
++    if (rejectPalm(when)) {     // stylus is currently active
++            mPointerSimple.reset();
++            return;
++        }
++
+     if (mPointerSimple.down && !down) {
+         mPointerSimple.down = false;
+ 
+@@ -3535,6 +3543,8 @@ void TouchInputMapper::dispatchMotion(nsecs_t when, uint32_t policyFlags, uint32
+                                       const PointerCoords* coords, const uint32_t* idToIndex,
+                                       BitSet32 idBits, int32_t changedId, float xPrecision,
+                                       float yPrecision, nsecs_t downTime) {
++    if (rejectPalm(when)) return;
++
+     PointerCoords pointerCoords[MAX_POINTERS];
+     PointerProperties pointerProperties[MAX_POINTERS];
+     uint32_t pointerCount = 0;
+@@ -3916,4 +3926,12 @@ std::optional<int32_t> TouchInputMapper::getAssociatedDisplayId() {
+     return std::nullopt;
+ }
+ 
++nsecs_t TouchInputMapper::mLastStylusTime = 0;
++
++bool TouchInputMapper::rejectPalm(nsecs_t when) {
++    return (when - mLastStylusTime < STYLUS_PALM_REJECTION_TIME) &&
++        mPointerSimple.currentProperties.toolType != AMOTION_EVENT_TOOL_TYPE_STYLUS &&
++    mPointerSimple.currentProperties.toolType != AMOTION_EVENT_TOOL_TYPE_ERASER;
++}
++
+ } // namespace android
+diff --git a/services/inputflinger/reader/mapper/TouchInputMapper.h b/services/inputflinger/reader/mapper/TouchInputMapper.h
+index 58bfc5c59..4903d3bf5 100644
+--- a/services/inputflinger/reader/mapper/TouchInputMapper.h
++++ b/services/inputflinger/reader/mapper/TouchInputMapper.h
+@@ -375,6 +375,9 @@ protected:
+     // The time the primary pointer last went down.
+     nsecs_t mDownTime;
+ 
++    // Time when the stylus touched last
++    static nsecs_t mLastStylusTime ;
++
+     // The pointer controller, or null if the device is not a pointer.
+     sp<PointerControllerInterface> mPointerController;
+ 
+@@ -702,6 +705,7 @@ private:
+ 
+     void sync(nsecs_t when);
+ 
++    bool rejectPalm(nsecs_t when) ;
+     bool consumeRawTouches(nsecs_t when, uint32_t policyFlags);
+     void processRawTouches(bool timeout);
+     void cookAndDispatch(nsecs_t when);
+-- 
+2.25.1
+

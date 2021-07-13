@@ -1,0 +1,40 @@
+From deaccda2b798a11d6c603203f8bcbd7bd2b54af1 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Wed, 23 Dec 2020 12:59:09 +0100
+Subject: [PATCH] Integrated BOARD_EGL_NEEDS_HANDLE_VALUE.
+
+Change-Id: I2da0e8aad9f0c155e3cec91a9b5a12e7f6b341c2
+---
+ libs/ui/Android.bp        | 1 +
+ libs/ui/GraphicBuffer.cpp | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/libs/ui/Android.bp b/libs/ui/Android.bp
+index 73adb0ae2..b8ae7d5ac 100644
+--- a/libs/ui/Android.bp
++++ b/libs/ui/Android.bp
+@@ -69,6 +69,7 @@ cc_library_shared {
+         "gralloc_10_usage_bits_defaults",
+         // Uncomment the following line to enable VALIDATE_REGIONS traces
+         // "libui-validate-regions-defaults",
++        "egl_needs_handle_value_defaults",
+     ],
+ 
+     shared_libs: [
+diff --git a/libs/ui/GraphicBuffer.cpp b/libs/ui/GraphicBuffer.cpp
+index 3732fee7f..3755d5663 100644
+--- a/libs/ui/GraphicBuffer.cpp
++++ b/libs/ui/GraphicBuffer.cpp
+@@ -125,7 +125,9 @@ void GraphicBuffer::free_handle()
+         GraphicBufferAllocator& allocator(GraphicBufferAllocator::get());
+         allocator.free(handle);
+     }
++#ifndef EGL_NEEDS_HANDLE
+     handle = nullptr;
++#endif
+ }
+ 
+ status_t GraphicBuffer::initCheck() const {
+-- 
+2.25.1
+

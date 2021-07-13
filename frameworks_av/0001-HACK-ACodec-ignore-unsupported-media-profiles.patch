@@ -1,0 +1,60 @@
+From f0551a2858d1fa5686964a57ea7c2d752f88fb03 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@zell-net.at>
+Date: Thu, 14 Jan 2021 21:36:22 +0100
+Subject: [PATCH] HACK: ACodec: ignore unsupported media profiles
+
+Change-Id: Ic8f7003e0c7c5fe2adecb153104b996bc74b1953
+---
+ media/libstagefright/ACodec.cpp                            | 4 ++--
+ services/audiopolicy/managerdefault/AudioPolicyManager.cpp | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/media/libstagefright/ACodec.cpp b/media/libstagefright/ACodec.cpp
+index a742ff4765..0e9b2ce7f4 100644
+--- a/media/libstagefright/ACodec.cpp
++++ b/media/libstagefright/ACodec.cpp
+@@ -4842,8 +4842,8 @@ status_t ACodec::verifySupportForProfileAndLevel(
+         }
+ 
+         if (index == kMaxIndicesToCheck) {
+-            ALOGW("[%s] stopping checking profiles after %u: %x/%x",
+-                    mComponentName.c_str(), index,
++            ALOGW("[%s] %d: stopping checking profiles after %u: %x/%x",
++                    mComponentName.c_str(), __LINE__, index,
+                     params.eProfile, params.eLevel);
+         }
+     }
+diff --git a/services/audiopolicy/managerdefault/AudioPolicyManager.cpp b/services/audiopolicy/managerdefault/AudioPolicyManager.cpp
+index 07e80d11c9..d294b71995 100644
+--- a/services/audiopolicy/managerdefault/AudioPolicyManager.cpp
++++ b/services/audiopolicy/managerdefault/AudioPolicyManager.cpp
+@@ -1984,7 +1984,7 @@ status_t AudioPolicyManager::getInputForAttr(const audio_attributes_t *attr,
+     }
+ 
+     // Explicit routing?
+-    sp<DeviceDescriptor> explicitRoutingDevice = 
++    sp<DeviceDescriptor> explicitRoutingDevice =
+             mAvailableInputDevices.getDeviceFromId(*selectedDeviceId);
+ 
+     // special case for mmap capture: if an input IO handle is specified, we reuse this input if
+@@ -2166,7 +2166,7 @@ audio_io_handle_t AudioPolicyManager::getInputForDevice(const sp<DeviceDescripto
+             profileFlags = AUDIO_INPUT_FLAG_NONE; // retry
+         } else { // fail
+             ALOGW("%s could not find profile for device %s, sampling rate %u, format %#x, "
+-                  "channel mask 0x%X, flags %#x", __func__, device->toString().c_str(), 
++                  "channel mask 0x%X, flags %#x", __func__, device->toString().c_str(),
+                   config->sample_rate, config->format, config->channel_mask, flags);
+             return input;
+         }
+@@ -5048,7 +5048,7 @@ status_t AudioPolicyManager::checkInputsForDevice(const sp<DeviceDescriptor>& de
+             } // endif input != 0
+ 
+             if (input == AUDIO_IO_HANDLE_NONE) {
+-                ALOGW("%s could not open input for device %s", __func__,  
++                ALOGW("%s could not open input for device %s", __func__,
+                        device->toString().c_str());
+                 profiles.removeAt(profile_index);
+                 profile_index--;
+-- 
+2.25.1
+

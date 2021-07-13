@@ -1,0 +1,16 @@
+Index: services/inputflinger/reader/mapper/TouchInputMapper.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- services/inputflinger/reader/mapper/TouchInputMapper.cpp	(revision 7e654fcc223f6d191528028b7781bb23254115d7)
++++ services/inputflinger/reader/mapper/TouchInputMapper.cpp	(revision 40990951bac2b0f53610d734633a8ec5ff3d0b0a)
+@@ -3396,7 +3396,7 @@
+     int32_t displayId = mViewport.displayId;
+ 
+     if (down || hovering) {
+-        mPointerController->setPresentation(PointerControllerInterface::PRESENTATION_POINTER);
++        mPointerController->setPresentation(PointerControllerInterface::PRESENTATION_SPOT);
+         mPointerController->clearSpots();
+         mPointerController->setButtonState(mCurrentRawState.buttonState);
+         mPointerController->unfade(PointerControllerInterface::TRANSITION_IMMEDIATE);

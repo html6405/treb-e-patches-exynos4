@@ -1,0 +1,16 @@
+Index: core/java/android/os/Build.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/java/android/os/Build.java	(revision 8d8aec395a9992c23aa90e7c5448f76dc8785c87)
++++ core/java/android/os/Build.java	(revision 8532e515d62c73d6f038011c151b2104385217a8)
+@@ -1123,7 +1123,7 @@
+                         + String.valueOf(result));
+             }
+ 
+-            return result == 0;
++            return true;
+         }
+ 
+         final String system = SystemProperties.get("ro.system.build.fingerprint");

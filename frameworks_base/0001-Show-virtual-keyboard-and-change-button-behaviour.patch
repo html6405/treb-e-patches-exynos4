@@ -1,0 +1,48 @@
+From b82195f43f16547b3e59f81bb06cac59792befb7 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@mhs-solutions.at>
+Date: Tue, 6 Jul 2021 14:50:05 +0200
+Subject: [PATCH] Show virtual keyboard and change button behaviour.
+
+---
+ core/res/res/values/config.xml                    | 4 ++--
+ packages/SettingsProvider/res/values/defaults.xml | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
+index 76cb385c0077..9a830e2cefd3 100644
+--- a/core/res/res/values/config.xml
++++ b/core/res/res/values/config.xml
+@@ -1169,7 +1169,7 @@
+          This needs to match the constants in
+          policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+     -->
+-    <integer name="config_longPressOnHomeBehavior">0</integer>
++    <integer name="config_longPressOnHomeBehavior">7</integer>
+ 
+     <!-- Control the behavior when the user double-taps the home button.
+             0 - Nothing
+@@ -1177,7 +1177,7 @@
+          This needs to match the constants in
+          policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+     -->
+-    <integer name="config_doubleTapOnHomeBehavior">0</integer>
++    <integer name="config_doubleTapOnHomeBehavior">2</integer>
+ 
+     <!-- Note: This setting is deprecated, please use
+     config_screenBrightnessSettingMinimumFloat instead -->
+diff --git a/packages/SettingsProvider/res/values/defaults.xml b/packages/SettingsProvider/res/values/defaults.xml
+index 51f69a95e163..1a99c19f69ed 100644
+--- a/packages/SettingsProvider/res/values/defaults.xml
++++ b/packages/SettingsProvider/res/values/defaults.xml
+@@ -125,7 +125,7 @@
+     <integer name="def_multi_press_timeout_millis">300</integer>
+ 
+     <!-- Default for Settings.Secure.SHOW_IME_WITH_HARD_KEYBOARD -->
+-    <bool name="def_show_ime_with_hard_keyboard">false</bool>
++    <bool name="def_show_ime_with_hard_keyboard">true</bool>
+ 
+     <!-- Default for Settings.System.POINTER_SPEED -->
+     <integer name="def_pointer_speed">0</integer>
+-- 
+2.25.1
+

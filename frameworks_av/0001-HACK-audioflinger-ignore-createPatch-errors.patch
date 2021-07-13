@@ -1,0 +1,111 @@
+From 3cccdf95d3cd552c13ca78ed77c1d9393e0a5e96 Mon Sep 17 00:00:00 2001
+From: html6405 <peter.schelchshorn@zell-net.at>
+Date: Thu, 14 Jan 2021 22:56:39 +0100
+Subject: [PATCH] HACK: audioflinger: ignore createPatch errors.
+
+Change-Id: Id3508334d93a06d5f9070d814c939ba076675f71
+---
+ services/audioflinger/Threads.cpp | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/services/audioflinger/Threads.cpp b/services/audioflinger/Threads.cpp
+index 1d0147d56b..52c10d2e56 100644
+--- a/services/audioflinger/Threads.cpp
++++ b/services/audioflinger/Threads.cpp
+@@ -583,12 +583,15 @@ status_t AudioFlinger::ThreadBase::sendConfigEvent_l(sp<ConfigEvent>& event)
+     if (event->mRequiresSystemReady && !mSystemReady) {
+         event->mWaitStatus = false;
+         mPendingConfigEvents.add(event);
++	ALOGE("%s: %d: return status = %d", __func__, __LINE__, status);
+         return status;
+     }
+     mConfigEvents.add(event);
+     ALOGV("sendConfigEvent_l() num events %zu event %d", mConfigEvents.size(), event->mType);
+     mWaitWorkCV.signal();
+     mLock.unlock();
++    ALOGE("%s: %d: event->mStatus = %d", __func__, __LINE__, status);
++
+     {
+         Mutex::Autolock _l(event->mLock);
+         while (event->mWaitStatus) {
+@@ -600,6 +603,8 @@ status_t AudioFlinger::ThreadBase::sendConfigEvent_l(sp<ConfigEvent>& event)
+         status = event->mStatus;
+     }
+     mLock.lock();
++
++    ALOGE("%s: %d: event->mStatus = %d", __func__, __LINE__, status);
+     return status;
+ }
+ 
+@@ -667,6 +672,7 @@ status_t AudioFlinger::ThreadBase::sendCreateAudioPatchConfigEvent(
+     Mutex::Autolock _l(mLock);
+     sp<ConfigEvent> configEvent = (ConfigEvent *)new CreateAudioPatchConfigEvent(*patch, *handle);
+     status_t status = sendConfigEvent_l(configEvent);
++    ALOGE("%s: %d: sendConfigEvent_l returns %d", __func__, __LINE__, status);
+     if (status == NO_ERROR) {
+         CreateAudioPatchConfigEventData *data =
+                                         (CreateAudioPatchConfigEventData *)configEvent->mData.get();
+@@ -733,6 +739,7 @@ void AudioFlinger::ThreadBase::processConfigEvents_l()
+             CreateAudioPatchConfigEventData *data =
+                                             (CreateAudioPatchConfigEventData *)event->mData.get();
+             event->mStatus = createAudioPatch_l(&data->mPatch, &data->mHandle);
++            ALOGE("%s: %d: createAudioPatch_l returns %d", __func__, __LINE__, event->mStatus);
+             const DeviceTypeSet newDevices = getDeviceTypes();
+             mLocalLog.log("CFG_EVENT_CREATE_AUDIO_PATCH: old device %s (%s) new device %s (%s)",
+                     dumpDeviceTypes(oldDevices).c_str(), toString(oldDevices).c_str(),
+@@ -4188,7 +4195,8 @@ status_t AudioFlinger::MixerThread::createAudioPatch_l(const struct audio_patch
+     } else {
+         status = PlaybackThread::createAudioPatch_l(patch, handle);
+     }
+-    return status;
++    ALOGE("%s: %d: returning %d", __func__, __LINE__, status);
++    return NO_ERROR;//status;
+ }
+ 
+ status_t AudioFlinger::PlaybackThread::createAudioPatch_l(const struct audio_patch *patch,
+@@ -4281,7 +4289,10 @@ status_t AudioFlinger::PlaybackThread::createAudioPatch_l(const struct audio_pat
+     if (configChanged) {
+         sendIoConfigEvent_l(AUDIO_OUTPUT_CONFIG_CHANGED);
+     }
+-    return status;
++
++    ALOGE("%s: %d: returning %d", __func__, __LINE__, status);
++
++    return NO_ERROR;//status;
+ }
+ 
+ status_t AudioFlinger::MixerThread::releaseAudioPatch_l(const audio_patch_handle_t handle)
+@@ -8618,7 +8629,10 @@ status_t AudioFlinger::RecordThread::createAudioPatch_l(const struct audio_patch
+         track->logEndInterval();
+         track->logBeginInterval(pathSourcesAsString);
+     }
+-    return status;
++
++    ALOGE("%s: %d: returning %d", __func__, __LINE__, status);
++
++    return NO_ERROR;//status;
+ }
+ 
+ status_t AudioFlinger::RecordThread::releaseAudioPatch_l(const audio_patch_handle_t handle)
+@@ -9269,7 +9283,10 @@ status_t AudioFlinger::MmapThread::createAudioPatch_l(const struct audio_patch *
+         mPatch = *patch;
+         mDeviceId = deviceId;
+     }
+-    return status;
++
++    ALOGE("%s: %d: returning %d", __func__, __LINE__, status);
++
++    return NO_ERROR;//status;
+ }
+ 
+ status_t AudioFlinger::MmapThread::releaseAudioPatch_l(const audio_patch_handle_t handle)
+@@ -9757,4 +9774,4 @@ void AudioFlinger::MmapCaptureThread::toAudioPortConfig(struct audio_port_config
+     }
+ }
+ 
+-} // namespace android
++} // namespace android
+\ No newline at end of file
+-- 
+2.25.1
+
